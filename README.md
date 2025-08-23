@@ -1,41 +1,24 @@
-# NoteTrack
+# Note Track
 
-NoteTrack is a note-taking application built with Next.js 15, React 19, and Supabase.
+Note Track ist eine kleine App, die dir hilft, deine Prüfungen zu checken und automatisch deine Plus- und Minuspunkte fürs Gymi auszurechnen.
 
-## Deployment to Netlify
+## Wie es läuft
 
-This project is configured for deployment to Netlify using the `netlify.toml` configuration file.
+* Prüfungen im Kalender eintragen, mit Fach.
+* Zwei Wochen nach der Prüfung kommt eine Erinnerung:
+  „Prüfung bekommen?“ Ja / Nein
 
-### Netlify Configuration
+### Wenn Ja
 
-The `netlify.toml` file in the root directory contains all the necessary configuration for building and deploying the application:
+* Note und Gewichtung eintragen:
 
-- **Base directory**: `frontend`
-- **Build command**: `next build`
-- **Publish directory**: `.next`
-- **Netlify Next.js plugin**: Automatically handles Next.js specific optimizations
+  * Links: Note
+  * Rechts: Gewichtung (Standard = 1)
 
-### Environment Variables
+### Wenn Nein
 
-Make sure to set the following environment variables in your Netlify project settings:
+* Nochmals eine Woche später kommt die Erinnerung.
 
-- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anonymous key
+## Übersicht
 
-### Deployment Steps
-
-1. Connect your GitHub repository to Netlify
-2. Netlify will automatically detect the `netlify.toml` file
-3. The build will run automatically on each push to the main branch
-
-### Local Development
-
-To run the project locally:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The application will be available at http://localhost:3000
+Die App rechnet deine Plus- und Minuspunkte zusammen und zeigt dir eine Übersicht, damit du weisst, wie du stehst.
