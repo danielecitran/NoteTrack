@@ -1,35 +1,16 @@
 [build]
   base = "frontend"
-  command = "npm run build"
+  command = "npm ci && npm run build"
   publish = "out"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-
-[functions]
-  included_files = ["public/**/*", "lib/**/*"]
-
-[dev]
-  command = "next dev"
-  port = 3000
-  targetPort = 3000
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/assets/*"
-  to = "/public/assets/:splat"
-  status = 200
+# Plugin entfernen da wir statischen Export verwenden
+# [[plugins]]
+#   package = "@netlify/plugin-nextjs"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  force = false
-  conditions = { Role = ["admin", "editor"] }
 
 [[headers]]
   for = "/*"
