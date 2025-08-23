@@ -68,7 +68,8 @@ export default function LoginPage() {
       
       <div className="relative flex items-center justify-center min-h-screen p-6">
         <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 w-full max-w-md">
-          <div className="text-center mb-8">
+          <div className="relative">
+            <div className="text-center mb-8">
             <Link href="/" className="group inline-block">
               <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-900 dark:from-white dark:via-blue-200 dark:to-indigo-300 tracking-tight hover:scale-105 transition-transform duration-300">
                 NoteTrack
@@ -163,5 +164,7 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  </div>
+</div>
+)
 }
