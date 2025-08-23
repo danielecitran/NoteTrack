@@ -20,7 +20,4 @@ Note Track ist eine kleine App, die dir hilft, deine Prüfungen zu checken und a
 
 * Nochmals eine Woche später kommt die Erinnerung.
 
-## Übersicht
-
-=======
 # Note Track, Track the shiii<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/5da26981-51b6-4d43-826d-3651f87a4c3b" />
