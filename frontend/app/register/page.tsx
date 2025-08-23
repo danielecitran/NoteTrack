@@ -212,6 +212,7 @@ export default function RegisterPage() {
             Zurück zur Startseite
           </Link>
         </div>
+        </div>
       </div>
     </div>
   )
