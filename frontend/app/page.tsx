@@ -15,6 +15,7 @@ export default function Home() {
       router.push('/dashboard')
     }
   }, [user, router])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-6">
       <div className="text-center space-y-12 max-w-md w-full">
@@ -49,5 +50,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function DashboardPage() {
   const { user, signOut, loading } = useAuth()
@@ -86,6 +87,13 @@ export default function DashboardPage() {
               <button className="w-full border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700">
                 Notizen durchsuchen
               </button>
+
+              {/* Kalender-Button */}
+              <Link href="/calendar">
+                <button className="w-full bg-blue-600 dark:bg-blue-500 text-white dark:text-gray-900 py-3 px-4 rounded-xl font-medium transition-all duration-200 hover:bg-blue-500 dark:hover:bg-blue-400 hover:scale-105">
+                  Kalender öffnen
+                </button>
+              </Link>
             </div>
           </div>
 
