@@ -19,8 +19,15 @@ The `netlify.toml` file in the root directory contains all the necessary configu
 
 Make sure to set the following environment variables in your Netlify project settings:
 
-- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL (e.g., https://your-project.supabase.co)
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anonymous key
+
+These variables are already present in your `.env.local` file. When deploying to Netlify, you need to add them to your project settings:
+
+1. Go to your Netlify project dashboard
+2. Navigate to "Site settings" > "Build & deploy" > "Environment"
+3. Click "Edit variables" and add both variables with their values from `.env.local`
+4. Save and trigger a new deployment
 
 ### Deployment Steps
 
