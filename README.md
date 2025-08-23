@@ -1,4 +1,4 @@
-# Note Track, Track the shiii
+# Note Track
 
 Note Track ist eine kleine App, die dir hilft, deine Prüfungen zu checken und automatisch deine Plus- und Minuspunkte fürs Gymi auszurechnen.
 
