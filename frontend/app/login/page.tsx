@@ -2,16 +2,25 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const { signIn, user } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Check for registration success message
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      setSuccess('Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mail für die Bestätigung und melden Sie sich an.')
+    }
+  }, [searchParams])
 
   // Redirect if already logged in
   useEffect(() => {
@@ -23,6 +32,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
 
     if (!email || !password) {
@@ -94,6 +104,12 @@ export default function LoginPage() {
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3">
               <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-3">
+              <p className="text-green-600 dark:text-green-400 text-sm">{success}</p>
             </div>
           )}
 

@@ -61,13 +61,8 @@ export default function RegisterPage() {
         setError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.')
       }
     } else {
-      setSuccess('Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mail für die Bestätigung.')
-      // Clear form
-      setFirstName('')
-      setLastName('')
-      setEmail('')
-      setPassword('')
-      setConfirmPassword('')
+      // Redirect to login page with success message
+      router.push('/login?registered=true')
     }
     
     setLoading(false)
