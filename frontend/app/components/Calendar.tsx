@@ -1,181 +1,166 @@
 'use client';
 import { useState, useEffect } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabaseClient';
 
-interface CalendarEvent {
+interface Exam {
   id: string;
   title: string;
-  start: string;
-  user_id?: string;
+  subject: string;
+  date: string;
+  description?: string;
+  color: string;
+  priority: 'low' | 'medium' | 'high';
 }
 
 export default function Calendar() {
-  const { user } = useAuth();
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState<{
-    type: 'create' | 'delete' | null;
-    event?: CalendarEvent;
-    date?: string;
-  }>({ type: null });
-  const [title, setTitle] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [modalExam, setModalExam] = useState<Exam | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
+  const [formData, setFormData] = useState({
+    title: '',
+    subject: '',
+    date: '',
+    description: '',
+    priority: 'medium' as 'low' | 'medium' | 'high'
+  });
+
+  // Lade Prüfungen aus localStorage
   useEffect(() => {
-    if (!user) return;
-    const load = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('start');
-      if (error) console.error(error);
-      else setEvents(data || []);
-      setLoading(false);
+    const saved = localStorage.getItem('calendar-exams');
+    if (saved) setExams(JSON.parse(saved));
+  }, []);
+
+  const saveExams = (newExams: Exam[]) => {
+    localStorage.setItem('calendar-exams', JSON.stringify(newExams));
+    setExams(newExams);
+  };
+
+  const getColor = (priority: Exam['priority']) =>
+    priority === 'high' ? '#ef4444' : priority === 'medium' ? '#f59e0b' : '#10b981';
+
+  const openModal = (exam?: Exam) => {
+    if (exam) {
+      setModalExam(exam);
+      setFormData({
+        title: exam.title,
+        subject: exam.subject,
+        date: exam.date.split('T')[0],
+        description: exam.description || '',
+        priority: exam.priority
+      });
+    } else {
+      setModalExam(null);
+      setFormData({ title: '', subject: '', date: '', description: '', priority: 'medium' });
+    }
+    setShowModal(true);
+  };
+
+  const addOrEditExam = () => {
+    if (!formData.title || !formData.subject || !formData.date) return;
+
+    const newExam: Exam = {
+      id: modalExam ? modalExam.id : Date.now().toString(),
+      ...formData,
+      color: getColor(formData.priority)
     };
-    load();
-  }, [user]);
 
-  const createEvent = async () => {
-    if (!user || !selectedDate || !title) return;
-    const { data, error } = await supabase
-      .from('events')
-      .insert([{ title, start: selectedDate, user_id: user.id }])
-      .select();
-    if (!error && data) setEvents([...events, data[0]]);
-    setTitle('');
+    const updatedExams = modalExam
+      ? exams.map(e => (e.id === modalExam.id ? newExam : e))
+      : [...exams, newExam];
+
+    saveExams(updatedExams);
+    setShowModal(false);
   };
 
-  const createEventFromDate = async () => {
-    if (!user || !modal.date || !title) return;
-    const { data, error } = await supabase
-      .from('events')
-      .insert([{ title, start: modal.date, user_id: user.id }])
-      .select();
-    if (!error && data) setEvents([...events, data[0]]);
-    setModal({ type: null });
-    setTitle('');
+  const deleteExam = (id: string) => {
+    if (confirm('Prüfung wirklich löschen?')) saveExams(exams.filter(e => e.id !== id));
   };
 
-  const deleteEvent = async () => {
-    if (!user || !modal.event) return;
-    const { error } = await supabase
-      .from('events')
-      .delete()
-      .eq('id', modal.event.id)
-      .eq('user_id', user.id);
-    if (!error) setEvents(events.filter(e => e.id !== modal.event?.id));
-    setModal({ type: null });
-  };
+  const monthDays = (() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    return [
+      ...Array(firstDay).fill(null),
+      ...Array.from({ length: totalDays }, (_, i) => new Date(year, month, i + 1))
+    ];
+  })();
 
-  if (loading) return <div className="flex justify-center items-center h-64">Lädt...</div>;
+  const examsForDate = (date: Date) => exams.filter(e => new Date(e.date).toDateString() === date.toDateString());
+  const monthNames = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md">
-      {/* Termin erstellen Bereich */}
-      <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-          Neue Prüfungsdatum erstellen
-        </h3>
-        <div className="flex flex-col sm:flex-row gap-4 items-end">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Datum
-            </label>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={e => setSelectedDate(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Prüfung
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder="Termin Titel eingeben"
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-            />
-          </div>
-          <button 
-            onClick={createEvent} 
-            disabled={!title || !selectedDate}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Termin erstellen
-          </button>
+    <div className="bg-white rounded-lg shadow-lg p-6">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold">{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</h2>
+          <p className="text-gray-600">Prüfungskalender</p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => setCurrentDate(d => new Date(d.getFullYear(), d.getMonth()-1,1))} className="px-3 py-2 bg-gray-200 rounded">←</button>
+          <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 bg-blue-600 text-white rounded">Heute</button>
+          <button onClick={() => setCurrentDate(d => new Date(d.getFullYear(), d.getMonth()+1,1))} className="px-3 py-2 bg-gray-200 rounded">→</button>
+          <button onClick={() => openModal()} className="px-4 py-2 bg-green-600 text-white rounded">+ Neuer Eintrag</button>
         </div>
       </div>
 
+      {/* Wochentage */}
+      <div className="grid grid-cols-7 gap-1 mb-2 text-center font-semibold text-gray-600">
+        {['So','Mo','Di','Mi','Do','Fr','Sa'].map(d => <div key={d}>{d}</div>)}
+      </div>
+
+      {/* Tage */}
+      <div className="grid grid-cols-7 gap-1">
+        {monthDays.map((day, i) =>
+          !day ? <div key={i} className="h-24 bg-gray-50 rounded"></div> :
+          <div key={i} className={`h-24 border rounded p-1 ${day.toDateString()===new Date().toDateString()?'bg-blue-100 border-blue-300':''} ${day.getMonth()!==currentDate.getMonth()?'text-gray-400':''}`}>
+            <div className="text-sm font-medium mb-1">{day.getDate()}</div>
+            <div className="space-y-1">
+              {examsForDate(day).map(e => (
+                <div key={e.id} className="text-xs p-1 rounded text-white truncate relative group cursor-pointer" style={{backgroundColor:e.color}} title={`${e.subject}: ${e.title}`} onClick={() => openModal(e)}>
+                  <span className="font-medium">{e.subject}:</span> {e.title}
+                  <button onClick={ev=>{ev.stopPropagation(); deleteExam(e.id)}} className="absolute -top-1 -right-1 bg-red-500 w-4 h-4 text-xs rounded-full text-white opacity-0 group-hover:opacity-100">×</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Modal */}
-      {modal.type && (
+      {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-700 rounded-lg p-6 w-80">
-            {modal.type === 'create' && (
-              <>
-                <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">
-                  Neuen Termin für {new Date(modal.date!).toLocaleDateString('de-DE')}
-                </h3>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={e => setTitle(e.target.value)}
-                  placeholder="Termin Titel eingeben"
-                  className="w-full mb-4 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                />
-                <div className="flex justify-end space-x-2">
-                  <button onClick={() => setModal({ type: null })} className="px-3 py-1 rounded-md bg-gray-200">Abbrechen</button>
-                  <button 
-                    onClick={createEventFromDate} 
-                    disabled={!title}
-                    className="px-3 py-1 rounded-md bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Erstellen
-                  </button>
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-bold mb-4">{modalExam?'Prüfung bearbeiten':'Neue Prüfung'}</h3>
+            <div className="space-y-4">
+              {['title','subject','date','description'].map(field => (
+                <div key={field}>
+                  <label className="block text-sm font-medium mb-1">{field==='date'?'Datum':field==='title'?'Titel':field==='subject'?'Fach':'Beschreibung'}</label>
+                  {field==='description' ? 
+                    <textarea value={formData.description} onChange={e=>setFormData({...formData, description:e.target.value})} className="w-full border rounded px-3 py-2" rows={3}/> :
+                    <input type={field==='date'?'date':'text'} value={(formData as any)[field]} onChange={e=>setFormData({...formData,[field]:e.target.value})} className="w-full border rounded px-3 py-2"/>
+                  }
                 </div>
-              </>
-            )}
-            {modal.type === 'delete' && (
-              <>
-                <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">Termin löschen</h3>
-                <p className="mb-4 text-sm text-gray-500 dark:text-gray-300">
-                  Möchten Sie <strong>{modal.event?.title}</strong> löschen?
-                </p>
-                <div className="flex justify-end space-x-2">
-                  <button onClick={() => setModal({ type: null })} className="px-3 py-1 rounded-md bg-gray-200">Abbrechen</button>
-                  <button onClick={deleteEvent} className="px-3 py-1 rounded-md bg-red-600 text-white">Löschen</button>
-                </div>
-              </>
-            )}
+              ))}
+              <div>
+                <label className="block text-sm font-medium mb-1">Priorität</label>
+                <select value={formData.priority} onChange={e=>setFormData({...formData, priority:e.target.value as any})} className="w-full border rounded px-3 py-2">
+                  <option value="low">Niedrig (Grün)</option>
+                  <option value="medium">Mittel (Orange)</option>
+                  <option value="high">Hoch (Rot)</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <button onClick={()=>setShowModal(false)} className="px-4 py-2 bg-gray-300 rounded">Abbrechen</button>
+              <button onClick={addOrEditExam} className="px-4 py-2 bg-blue-600 text-white rounded">{modalExam?'Aktualisieren':'Hinzufügen'}</button>
+            </div>
           </div>
         </div>
       )}
-
-      {/* Calendar */}
-      <FullCalendar
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        selectable
-        select={info => {
-          setSelectedDate(info.startStr);
-          setModal({ type: 'create', date: info.startStr });
-        }}
-        events={events}
-        eventClick={info => setModal({ type: 'delete', event: { id: info.event.id, title: info.event.title, start: info.event.startStr } })}
-        headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' }}
-        locale="de"
-        height="auto"
-      />
     </div>
   );
 }
