@@ -1,48 +1,25 @@
-# NoteTrack
+# Note Track, Track the shiii<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/5da26981-51b6-4d43-826d-3651f87a4c3b" />
 
-NoteTrack is a note-taking application built with Next.js 15, React 19, and Supabase.
 
-## Deployment to Netlify
+Note Track ist eine kleine App, die dir hilft, deine Prüfungen zu checken und automatisch deine Plus- und Minuspunkte fürs Gymi auszurechnen.
 
-This project is configured for deployment to Netlify using the `netlify.toml` configuration file.
+## Wie es läuft
 
-### Netlify Configuration
+* Prüfungen im Kalender eintragen, mit Fach.
+* Zwei Wochen nach der Prüfung kommt eine Erinnerung:
+  „Prüfung bekommen?“ Ja / Nein
 
-The `netlify.toml` file in the root directory contains all the necessary configuration for building and deploying the application:
+### Wenn Ja
 
-- **Base directory**: `frontend`
-- **Build command**: `next build`
-- **Publish directory**: `.next`
-- **Netlify Next.js plugin**: Automatically handles Next.js specific optimizations
+* Note und Gewichtung eintragen:
 
-### Environment Variables
+  * Links: Note
+  * Rechts: Gewichtung (Standard = 1)
 
-Make sure to set the following environment variables in your Netlify project settings:
+### Wenn Nein
 
-- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL (e.g., https://your-project.supabase.co)
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anonymous key
+* Nochmals eine Woche später kommt die Erinnerung.
 
-These variables are already present in your `.env.local` file. When deploying to Netlify, you need to add them to your project settings:
+## Übersicht
 
-1. Go to your Netlify project dashboard
-2. Navigate to "Site settings" > "Build & deploy" > "Environment"
-3. Click "Edit variables" and add both variables with their values from `.env.local`
-4. Save and trigger a new deployment
-
-### Deployment Steps
-
-1. Connect your GitHub repository to Netlify
-2. Netlify will automatically detect the `netlify.toml` file
-3. The build will run automatically on each push to the main branch
-
-### Local Development
-
-To run the project locally:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The application will be available at http://localhost:3000
+Die App rechnet deine Plus- und Minuspunkte zusammen und zeigt dir eine Übersicht, damit du weisst, wie du stehst.
