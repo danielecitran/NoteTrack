@@ -1,6 +1,6 @@
-# Note Track | 1. Platz beim KSH "hackts?!" Hackathon 🏆
+# NoteTrack | 1. Platz beim KSH "hackts?!" Hackathon 🏆
 
-Note Track ist eine kleine App, die dir hilft, deine Prüfungen im Blick zu behalten und automatisch deine Noten zu tracken.
+NoteTrack ist eine kleine Web Applikation, die dir hilft, deine Prüfungen im Blick zu behalten und automatisch deine Noten zu tracken.
 
 ## Funktionsweise
 
