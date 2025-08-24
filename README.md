@@ -53,3 +53,7 @@ Note Track ist eine kleine App, die dir hilft, deine Prüfungen im Blick zu beha
 * Gian Hari  
 * Cieslik Anthony  
 * Marc Holenstein  
+
+## Hackathon
+
+[hackts?!](https://hackts.ch)
